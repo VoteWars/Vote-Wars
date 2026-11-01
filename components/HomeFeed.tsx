@@ -30,31 +30,38 @@ interface HomeFeedProps {
   initialLiveTopics: LiveTopic[];
   brands: BrandTeaser[];
   initialEndedTopics: EndedTopic[];
+  feedError?: string | null;
 }
 
 export default function HomeFeed({
   initialLiveTopics,
   brands,
   initialEndedTopics,
+  feedError,
 }: HomeFeedProps) {
   const [tab, setTab] = useState<'live' | 'ended'>('live');
   const [endedTopics, setEndedTopics] = useState<EndedTopic[]>(initialEndedTopics);
   const [loadingEnded, setLoadingEnded] = useState(false);
+  const [endedError, setEndedError] = useState<string | null>(null);
 
   async function handleTabChange(nextTab: 'live' | 'ended') {
     setTab(nextTab);
     if (nextTab === 'ended') {
       try {
         setLoadingEnded(true);
+        setEndedError(null);
         const res = await fetch('/api/ended-topics');
+        const data = await res.json();
         if (res.ok) {
-          const data = await res.json();
           if (Array.isArray(data.topics)) {
             setEndedTopics(data.topics);
           }
+        } else {
+          setEndedError(data.error || 'Failed to query ended battles');
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Failed to refresh ended topics:', err);
+        setEndedError(err?.message || 'Network error fetching ended battles');
       } finally {
         setLoadingEnded(false);
       }
@@ -92,9 +99,30 @@ export default function HomeFeed({
 
       {tab === 'live' ? (
         <div className="topic-list">
-          {initialLiveTopics.length === 0 && (
+          {feedError && (
+            <div
+              className="glass-card"
+              style={{
+                padding: '16px 18px',
+                marginBottom: '10px',
+                background: 'rgba(255, 45, 64, 0.12)',
+                borderColor: 'rgba(255, 45, 64, 0.35)',
+                color: '#ff8894',
+                fontSize: '13px',
+                lineHeight: 1.5,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700, marginBottom: 4 }}>
+                ⚠️ Database Connection Notice
+              </div>
+              <div>{feedError}</div>
+            </div>
+          )}
+
+          {initialLiveTopics.length === 0 && !feedError && (
             <div className="glass-card empty-state">No active battles yet. Check back soon.</div>
           )}
+
           {initialLiveTopics.map((t, i) => (
             <div key={t.id}>
               <Link className="glass-card feed-topic" href={`/topic/${t.id}`}>
@@ -128,7 +156,27 @@ export default function HomeFeed({
         </div>
       ) : (
         <div className="topic-list">
-          {endedTopics.length === 0 ? (
+          {endedError && (
+            <div
+              className="glass-card"
+              style={{
+                padding: '16px 18px',
+                marginBottom: '10px',
+                background: 'rgba(255, 45, 64, 0.12)',
+                borderColor: 'rgba(255, 45, 64, 0.35)',
+                color: '#ff8894',
+                fontSize: '13px',
+                lineHeight: 1.5,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700, marginBottom: 4 }}>
+                ⚠️ Database Connection Notice
+              </div>
+              <div>{endedError}</div>
+            </div>
+          )}
+
+          {endedTopics.length === 0 && !endedError ? (
             <div className="glass-card empty-state">
               {loadingEnded ? 'Loading ended battles…' : 'No ended battles yet.'}
             </div>
