@@ -5,5 +5,5 @@ node_modules
 *.zip
 public/assets/
 .DS_Store
--e .aistudio/
+.aistudio/
 bun.lock
