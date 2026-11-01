@@ -1,5 +1,5 @@
 {
-  "name": "VoteWars",
+  "name": "Vote wars",
   "description": "The internet decides. VoteWars is your arena.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
