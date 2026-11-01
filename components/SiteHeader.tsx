@@ -1,0 +1,3 @@
+'use client'
+import Link from 'next/link';import {useAuth} from './AuthProvider';import {supabase} from '@/lib/supabase';import {LogOut} from 'lucide-react'
+export default function SiteHeader(){const {session}=useAuth();return <header className="topbar"><Link href="/" className="wordmark"><img src="/logo.png" alt="VoteWars"/></Link><div className="top-actions"><Link className="top-link" href="/brands">Roast brands</Link>{session?<button className="icon-button" title="Sign out" onClick={()=>supabase.auth.signOut()}><LogOut size={18}/></button>:<Link className="top-link" href="/login">Sign in</Link>}</div></header>}

@@ -1,0 +1,2 @@
+import {NextResponse} from 'next/server';import {adminDb,requireAdminRequest} from '@/lib/server'
+export async function POST(req:Request){try{if(!await requireAdminRequest(req))return NextResponse.json({error:'Forbidden'},{status:403});const {id}=await req.json();if(!id)return NextResponse.json({error:'Brand is required'},{status:400});const {error}=await adminDb.rpc('delete_active_brand',{p_brand:id});if(error)throw error;return NextResponse.json({ok:true})}catch(e:any){return NextResponse.json({error:e.message||'Brand deletion failed'},{status:400})}}

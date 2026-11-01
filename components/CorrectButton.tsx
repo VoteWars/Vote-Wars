@@ -1,0 +1,3 @@
+'use client'
+import {useAuth} from './AuthProvider';import {useState} from 'react'
+export default function CorrectButton({topicId,optionId}:{topicId:string,optionId:string}){const {session}=useAuth();const [busy,setBusy]=useState(false);const [msg,setMsg]=useState('');return <><button className="glass-button primary-button correct-button" disabled={busy} onClick={async()=>{setBusy(true);const r=await fetch('/api/mark-correct',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${session?.access_token||''}`},body:JSON.stringify({topicId,optionId})});const j=await r.json();setBusy(false);setMsg(r.ok?'Saved':j.error);if(r.ok)location.reload()}}>{busy?'Saving…':'Mark Correct'}</button>{msg&&<span className="hint"> {msg}</span>}</>}

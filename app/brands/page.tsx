@@ -1,0 +1,3 @@
+import {adminDb} from '@/lib/server';import BrandList from '@/components/BrandList'
+export const dynamic='force-dynamic'
+export default async function BrandsPage(){const {data}=await adminDb.from('brand_cards').select('id,name,tagline,logo_url,cook_votes,roast_votes').eq('status','active').order('position',{ascending:true});return <><div className="brand-heading"><h1>ROAST BRANDS</h1><p>They paid to be judged. Be honest.</p></div><BrandList brands={data||[]}/><p className="muted" style={{fontSize:13,textAlign:'center',marginTop:24}}>Got a brand? <a className="brand-yellow" href="/apply">Apply to be featured →</a></p></>}

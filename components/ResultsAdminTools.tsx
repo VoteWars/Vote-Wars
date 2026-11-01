@@ -1,0 +1,3 @@
+'use client'
+import {useAuth} from './AuthProvider';import {useEffect,useState} from 'react';import CorrectButton from './CorrectButton'
+export default function ResultsAdminTools({topicId,options,correct}:{topicId:string,options:{id:string}[],correct:string|null}){const {session}=useAuth();const [admin,setAdmin]=useState(false);useEffect(()=>{if(session)fetch('/api/admin-check',{headers:{Authorization:`Bearer ${session.access_token}`}}).then(r=>r.json()).then(d=>setAdmin(!!d.admin))},[session]);if(!admin||correct)return null;return <div style={{display:'grid',gap:8,marginTop:12}}>{options.map(o=><div key={o.id} style={{display:'flex',justifyContent:'flex-end'}}><CorrectButton topicId={topicId} optionId={o.id}/></div>)}</div>}
