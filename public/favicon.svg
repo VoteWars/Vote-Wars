@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF36D"/>
+      <stop offset="60%" stop-color="#F9D601"/>
+      <stop offset="100%" stop-color="#E5C100"/>
+    </linearGradient>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#222222"/>
+      <stop offset="100%" stop-color="#141414"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="18" flood-color="#F9D601" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  <!-- Background squircle -->
+  <rect x="20" y="20" width="472" height="472" rx="118" ry="118" fill="url(#bg)" stroke="#F9D601" stroke-width="12" stroke-opacity="0.85"/>
+  <!-- Stylized Iconic VoteWars V -->
+  <g filter="url(#glow)">
+    <path d="M125 140 L195 140 L256 325 L317 140 L387 140 L290 395 L222 395 Z" fill="url(#gold)"/>
+    <!-- Symmetrical Battle Crest Diamond -->
+    <polygon points="256,190 274,215 256,240 238,215" fill="#171717"/>
+    <polygon points="256,198 268,215 256,232 244,215" fill="#F9D601"/>
+  </g>
+</svg>
