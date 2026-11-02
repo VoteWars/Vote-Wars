@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useAuth } from './AuthProvider';
 import { supabase } from '@/lib/supabase';
 import { LogOut, ShieldCheck, Flame } from 'lucide-react';
@@ -9,6 +10,7 @@ import { LogOut, ShieldCheck, Flame } from 'lucide-react';
 export default function SiteHeader() {
   const { session } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!session?.access_token) {
@@ -25,9 +27,26 @@ export default function SiteHeader() {
 
   return (
     <header className="topbar">
-      <Link href="/" className="wordmark">
-        <img src="/logo.png" alt="VoteWars" />
-      </Link>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+        <Link href="/" className="wordmark">
+          <img src="/logo.png" alt="VoteWars" />
+        </Link>
+        <nav className="desktop-header-nav" aria-label="Desktop navigation">
+          <Link href="/" className={`top-nav-link ${pathname === '/' ? 'active' : ''}`}>
+            Battles
+          </Link>
+          <Link href="/create" className={`top-nav-link ${pathname === '/create' ? 'active' : ''}`}>
+            Create
+          </Link>
+          <Link href="/brands" className={`top-nav-link ${pathname === '/brands' ? 'active' : ''}`}>
+            Brands
+          </Link>
+          <Link href="/profile" className={`top-nav-link ${pathname === '/profile' ? 'active' : ''}`}>
+            Profile
+          </Link>
+        </nav>
+      </div>
+
       <div className="top-actions">
         {isAdmin && (
           <Link
@@ -38,7 +57,7 @@ export default function SiteHeader() {
             <ShieldCheck size={14} /> Admin
           </Link>
         )}
-        <Link className="roast-pill-btn" href="/brands">
+        <Link className="roast-pill-btn" href="/brands" title="Roast brands">
           <Flame size={13} className="flame-icon" />
           <span>Roast brands</span>
         </Link>
