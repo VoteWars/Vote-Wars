@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from './AuthProvider';
 import { supabase } from '@/lib/supabase';
@@ -29,7 +30,7 @@ export default function SiteHeader() {
     <header className="topbar">
       <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
         <Link href="/" className="wordmark">
-          <img src="/logo.png" alt="VoteWars" />
+          <Image src="/logo.png" alt="VoteWars" width={988} height={150} priority />
         </Link>
         <nav className="desktop-header-nav" aria-label="Desktop navigation">
           <Link href="/" className={`top-nav-link ${pathname === '/' ? 'active' : ''}`}>

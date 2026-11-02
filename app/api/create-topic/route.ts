@@ -8,74 +8,57 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Sign in to create a topic.' }, { status: 401 });
     }
 
-    const { title, options } = await req.json();
+    const body = await req.json();
+    const title = typeof body.title === 'string' ? body.title.trim() : '';
+    const options: string[] = Array.isArray(body.options)
+      ? body.options.map((value: unknown) => typeof value === 'string' ? value.trim() : '')
+      : [];
 
     if (
-      !title?.trim() ||
-      !Array.isArray(options) ||
-      options.length < 2 ||
-      options.length > 5 ||
-      options.some((o: string) => !o.trim())
+      !title || title.length > 140 ||
+      options.length < 2 || options.length > 5 ||
+      options.some((option) => !option || option.length > 100)
     ) {
       return NextResponse.json(
-        { error: 'Add a title and between 2 and 5 non-empty options.' },
+        { error: 'Add a title (max 140 characters) and 2–5 options (max 100 characters each).' },
         { status: 400 }
       );
     }
 
-    // Insert topic without type; if legacy NOT NULL constraint is still present on DB, auto-fallback
-    let topicResult = await adminDb
+    const { data: topic, error: topicError } = await adminDb
       .from('topics')
-      .insert({
-        title: title.trim(),
-        status: 'pending',
-        created_by: user.id,
-      })
+      .insert({ title, status: 'pending', created_by: user.id })
       .select('id')
       .single();
-
-    if (topicResult.error && topicResult.error.message.includes('type')) {
-      topicResult = await adminDb
-        .from('topics')
-        .insert({
-          title: title.trim(),
-          type: 'predict_it',
-          status: 'pending',
-          created_by: user.id,
-        })
-        .select('id')
-        .single();
-    }
-
-    if (topicResult.error) throw topicResult.error;
-
-    const topic = topicResult.data;
+    if (topicError) throw topicError;
 
     const { error: optionError } = await adminDb.from('options').insert(
-      options.map((text: string) => ({
-        topic_id: topic.id,
-        text: text.trim(),
-        created_by: user.id,
-      }))
+      options.map((text) => ({ topic_id: topic.id, text, created_by: user.id }))
     );
+    if (optionError) {
+      const { error: cleanupError } = await adminDb.from('topics').delete().eq('id', topic.id);
+      if (cleanupError) console.error('Could not clean up incomplete topic:', cleanupError);
+      throw optionError;
+    }
 
-    if (optionError) throw optionError;
-
-    await adminDb.rpc('increment_profile_stat', {
-      p_user: user.id,
-      p_column: 'total_topics_created',
-    });
-    await adminDb.rpc('increment_profile_stat', {
-      p_user: user.id,
-      p_column: 'total_options_created',
-      p_delta: options.length,
-    });
+    const [{ error: topicStatError }, { error: optionStatError }] = await Promise.all([
+      adminDb.rpc('increment_profile_stat', {
+        p_user: user.id,
+        p_column: 'total_topics_created',
+      }),
+      adminDb.rpc('increment_profile_stat', {
+        p_user: user.id,
+        p_column: 'total_options_created',
+        p_delta: options.length,
+      }),
+    ]);
+    if (topicStatError || optionStatError) {
+      console.error('Could not update topic creation stats:', topicStatError || optionStatError);
+    }
 
     return NextResponse.json({ ok: true, id: topic.id });
-  } catch (e: any) {
-    return NextResponse.json(
-      { error: e.message || 'Could not submit topic' },
-      { status: 400 }
-    );
+  } catch (error) {
+    console.error('Topic submission failed:', error);
+    return NextResponse.json({ error: 'Could not submit topic. Please try again.' }, { status: 500 });
   }
 }

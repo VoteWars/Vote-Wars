@@ -7,7 +7,7 @@ const defaultAnonKey =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqYndwdGJ3d3p3Y25ud2Fzd2J5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM1MjUyOTAsImV4cCI6MjEwOTEwMTI5MH0.cTgGcOuFY5zgctMnfYwxoT-k2ZY5f2qHtozlJYqoOrs';
 
 export async function getServerUser() {
-  const store = cookies();
+  const store = await cookies();
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || defaultUrl;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || defaultAnonKey;
 
@@ -31,7 +31,7 @@ export async function getServerUser() {
 }
 
 export async function isAdminUser(user: { email?: string } | null) {
-  const adminEmail = process.env.ADMIN_EMAIL || 'iamtheguest4234@gmail.com';
+  const adminEmail = process.env.ADMIN_EMAIL;
   return (
     !!user &&
     !!adminEmail &&

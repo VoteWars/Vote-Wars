@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 type Brand = {
   id: string;
@@ -91,7 +92,7 @@ export default function BrandList({ brands }: { brands: Brand[] }) {
               <span className="ad-label">Ad</span>
               <div className="brand-top">
                 {b.logo_url ? (
-                  <img className="brand-logo" src={b.logo_url} alt="" />
+                  <Image className="brand-logo" src={b.logo_url} alt="" width={54} height={54} unoptimized />
                 ) : (
                   <div className="brand-logo-fallback">{b.name[0]}</div>
                 )}

@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (code) {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL || defaultUrl;
     const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || defaultAnonKey;
 

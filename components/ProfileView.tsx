@@ -6,8 +6,6 @@ import Link from 'next/link';
 
 type P = {
   email: string;
-  predict_it_attempts: number;
-  predict_it_correct: number;
   total_votes_cast: number;
   total_topics_created: number;
   total_options_created: number;
@@ -41,7 +39,7 @@ export default function ProfileView() {
           Your Profile
         </h1>
         <p className="muted" style={{ fontSize: '14px', marginBottom: '20px' }}>
-          Sign in to track your prediction accuracy, voting history, and battles.
+          Sign in to track your voting and topic creation stats.
         </p>
         <Link
           className="glass-button primary-button"
@@ -73,9 +71,6 @@ export default function ProfileView() {
     return <div className="glass-card empty-state">Loading your stats…</div>;
   }
 
-  const attempts = p.predict_it_attempts || 0;
-  const accuracy = attempts ? Math.round((p.predict_it_correct / attempts) * 100) : 0;
-  const color = accuracy > 60 ? '#00C853' : accuracy >= 40 ? '#F9D601' : '#FF2D40';
   const isNewUser = p.total_votes_cast === 0 && p.total_topics_created === 0;
 
   return (
@@ -98,23 +93,6 @@ export default function ProfileView() {
         >
           📧 <strong>Notice:</strong> When you create an account, you will receive an email from <strong>Supabase Auth</strong> to confirm and protect your account.
         </div>
-      )}
-
-      {attempts > 0 && (
-        <section className="profile-top">
-          <div
-            className="accuracy-ring"
-            style={{ '--ring': color } as React.CSSProperties}
-          >
-            <strong>{accuracy}%</strong>
-          </div>
-          <div>
-            <h2 style={{ margin: '0 0 5px' }}>Prediction accuracy</h2>
-            <p className="muted" style={{ margin: 0 }}>
-              {p.predict_it_correct} correct out of {attempts}
-            </p>
-          </div>
-        </section>
       )}
 
       <div className="stat-grid" style={{ marginTop: 24 }}>
