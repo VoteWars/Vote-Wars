@@ -32,19 +32,19 @@ export default function SiteHeader() {
         {isAdmin && (
           <Link
             className="top-link brand-yellow"
-            style={{ fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}
+            style={{ fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: '12px' }}
             href="/admin"
           >
-            <ShieldCheck size={16} /> Admin
+            <ShieldCheck size={14} /> Admin
           </Link>
         )}
         <Link className="roast-pill-btn" href="/brands">
-          <Flame size={15} className="flame-icon" />
+          <Flame size={13} className="flame-icon" />
           <span>Roast brands</span>
         </Link>
         {session ? (
           <button className="icon-button" title="Sign out" onClick={() => supabase.auth.signOut()}>
-            <LogOut size={18} />
+            <LogOut size={16} />
           </button>
         ) : (
           <Link className="top-link" href="/login">
