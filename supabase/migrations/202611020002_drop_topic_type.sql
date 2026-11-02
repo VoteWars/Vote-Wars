@@ -1,4 +1,2 @@
--- VoteWars Migration: Remove types completely from topics table
-ALTER TABLE public.topics ALTER COLUMN type DROP NOT NULL;
-ALTER TABLE public.topics DROP CONSTRAINT IF EXISTS topics_type_check;
+-- Idempotent cleanup for databases that still have the retired topics.type column.
 ALTER TABLE public.topics DROP COLUMN IF EXISTS type;

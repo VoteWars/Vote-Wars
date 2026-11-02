@@ -44,7 +44,7 @@ export async function requireViewer(request: Request) {
 
 export async function requireAdminRequest(request: Request) {
   const user = await requireViewer(request);
-  const adminEmail = process.env.ADMIN_EMAIL || 'iamtheguest4234@gmail.com';
+  const adminEmail = process.env.ADMIN_EMAIL;
   return !!user &&
     !!adminEmail &&
     user.email?.toLowerCase() === adminEmail.toLowerCase()

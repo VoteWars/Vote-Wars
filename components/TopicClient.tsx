@@ -40,14 +40,16 @@ export default function TopicClient({
         'postgres_changes',
         { event: '*', schema: 'public', table: 'options', filter: `topic_id=eq.${topicId}` },
         async () => {
-          const { data } = await supabase
-            .from('options')
-            .select('id,text,vote_count,delete_votes,created_at')
-            .eq('topic_id', topicId)
-            .order('vote_count', { ascending: false });
-          if (data) {
-            setOpts(data as Option[]);
-          }
+          const [{ data }, { data: topic }] = await Promise.all([
+            supabase
+              .from('options')
+              .select('id,text,vote_count,delete_votes,created_at')
+              .eq('topic_id', topicId)
+              .order('vote_count', { ascending: false }),
+            supabase.from('topics').select('total_votes').eq('id', topicId).maybeSingle(),
+          ]);
+          if (data) setOpts(data as Option[]);
+          if (topic) setVotes(topic.total_votes ?? 0);
         }
       )
       .subscribe();

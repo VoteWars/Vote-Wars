@@ -30,31 +30,31 @@ export default function CreateTopicForm() {
     setBusy(true);
     setMsg('');
 
-    const r = await fetch('/api/create-topic', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${session.access_token}`,
-      },
-      body: JSON.stringify({
-        title,
-        type: 'predict_it',
-        options,
-      }),
-    });
+    try {
+      const r = await fetch('/api/create-topic', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ title, options }),
+      });
+      const j = await r.json();
 
-    const j = await r.json();
-    setBusy(false);
+      if (!r.ok) {
+        setMsg(j.error || 'Failed to submit topic');
+        return;
+      }
 
-    if (!r.ok) {
-      setMsg(j.error || 'Failed to submit topic');
-      return;
+      setMsg('Submitted for review! Redirecting…');
+      setTitle('');
+      setOptions(['', '']);
+      setTimeout(() => router.push('/'), 1600);
+    } catch {
+      setMsg('Unable to submit your topic right now. Check your connection and try again.');
+    } finally {
+      setBusy(false);
     }
-
-    setMsg('Submitted for review! Redirecting…');
-    setTitle('');
-    setOptions(['', '']);
-    setTimeout(() => router.push('/'), 1600);
   }
 
   return (
