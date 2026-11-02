@@ -8,10 +8,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Sign in to create a topic.' }, { status: 401 });
     }
 
-    const { title, type = 'predict_it', options } = await req.json();
-
-    const allowedTypes = ['predict_it', 'judge_it', 'settle_this', 'rank_it'];
-    const resolvedType = allowedTypes.includes(type) ? type : 'predict_it';
+    const { title, options } = await req.json();
 
     if (
       !title?.trim() ||
@@ -26,18 +23,33 @@ export async function POST(req: Request) {
       );
     }
 
-    const { data: topic, error } = await adminDb
+    // Insert topic without type; if legacy NOT NULL constraint is still present on DB, auto-fallback
+    let topicResult = await adminDb
       .from('topics')
       .insert({
         title: title.trim(),
-        type: resolvedType,
         status: 'pending',
         created_by: user.id,
       })
       .select('id')
       .single();
 
-    if (error) throw error;
+    if (topicResult.error && topicResult.error.message.includes('type')) {
+      topicResult = await adminDb
+        .from('topics')
+        .insert({
+          title: title.trim(),
+          type: 'predict_it',
+          status: 'pending',
+          created_by: user.id,
+        })
+        .select('id')
+        .single();
+    }
+
+    if (topicResult.error) throw topicResult.error;
+
+    const topic = topicResult.data;
 
     const { error: optionError } = await adminDb.from('options').insert(
       options.map((text: string) => ({

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from './AuthProvider';
 import { supabase } from '@/lib/supabase';
-import { LogOut, ShieldCheck } from 'lucide-react';
+import { LogOut, ShieldCheck, Flame } from 'lucide-react';
 
 export default function SiteHeader() {
   const { session } = useAuth();
@@ -38,8 +38,9 @@ export default function SiteHeader() {
             <ShieldCheck size={16} /> Admin
           </Link>
         )}
-        <Link className="top-link" href="/brands">
-          Roast brands
+        <Link className="roast-pill-btn" href="/brands">
+          <Flame size={15} className="flame-icon" />
+          <span>Roast brands</span>
         </Link>
         {session ? (
           <button className="icon-button" title="Sign out" onClick={() => supabase.auth.signOut()}>

@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Countdown from '@/components/Countdown';
+import { Search, X } from 'lucide-react';
 
 export type LiveTopic = {
   id: string;
@@ -40,6 +41,7 @@ export default function HomeFeed({
   feedError,
 }: HomeFeedProps) {
   const [tab, setTab] = useState<'live' | 'ended'>('live');
+  const [query, setQuery] = useState('');
   const [endedTopics, setEndedTopics] = useState<EndedTopic[]>(initialEndedTopics);
   const [loadingEnded, setLoadingEnded] = useState(false);
   const [endedError, setEndedError] = useState<string | null>(null);
@@ -68,6 +70,19 @@ export default function HomeFeed({
     }
   }
 
+  // Filter topics based on search query
+  const cleanQuery = query.trim().toLowerCase();
+
+  const filteredLive = useMemo(() => {
+    if (!cleanQuery) return initialLiveTopics;
+    return initialLiveTopics.filter((t) => t.title.toLowerCase().includes(cleanQuery));
+  }, [initialLiveTopics, cleanQuery]);
+
+  const filteredEnded = useMemo(() => {
+    if (!cleanQuery) return endedTopics;
+    return endedTopics.filter((t) => t.title.toLowerCase().includes(cleanQuery));
+  }, [endedTopics, cleanQuery]);
+
   return (
     <>
       <section className="feed-heading">
@@ -83,7 +98,7 @@ export default function HomeFeed({
             className={`segment-btn ${tab === 'live' ? 'active' : ''}`}
             onClick={() => handleTabChange('live')}
           >
-            Live
+            Live {initialLiveTopics.length > 0 && `(${initialLiveTopics.length})`}
           </button>
           <button
             type="button"
@@ -92,10 +107,50 @@ export default function HomeFeed({
             className={`segment-btn ${tab === 'ended' ? 'active' : ''}`}
             onClick={() => handleTabChange('ended')}
           >
-            Ended
+            Ended {endedTopics.length > 0 && `(${endedTopics.length})`}
           </button>
         </div>
       </section>
+
+      {/* Instant Search Bar */}
+      <div
+        className="glass-card"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          padding: '8px 14px',
+          marginBottom: 16,
+          borderRadius: 14,
+        }}
+      >
+        <Search size={18} style={{ color: '#888', flexShrink: 0 }} />
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search battles by topic or keyword…"
+          style={{
+            background: 'transparent',
+            border: 0,
+            outline: 'none',
+            color: '#fff',
+            width: '100%',
+            fontSize: '14px',
+          }}
+        />
+        {query && (
+          <button
+            type="button"
+            onClick={() => setQuery('')}
+            className="icon-button"
+            title="Clear search"
+            style={{ color: '#888', padding: 2 }}
+          >
+            <X size={16} />
+          </button>
+        )}
+      </div>
 
       {tab === 'live' ? (
         <div className="topic-list">
@@ -123,7 +178,23 @@ export default function HomeFeed({
             <div className="glass-card empty-state">No active battles yet. Check back soon.</div>
           )}
 
-          {initialLiveTopics.map((t, i) => (
+          {initialLiveTopics.length > 0 && filteredLive.length === 0 && (
+            <div className="glass-card empty-state" style={{ padding: '30px 20px' }}>
+              <p style={{ margin: '0 0 12px', fontSize: '15px' }}>
+                No active battles matching &ldquo;<strong>{query}</strong>&rdquo;
+              </p>
+              <button
+                type="button"
+                className="glass-button"
+                style={{ padding: '8px 18px', fontSize: '13px' }}
+                onClick={() => setQuery('')}
+              >
+                Clear search
+              </button>
+            </div>
+          )}
+
+          {filteredLive.map((t, i) => (
             <div key={t.id}>
               <Link className="glass-card feed-topic" href={`/topic/${t.id}`}>
                 <h2>{t.title}</h2>
@@ -132,7 +203,7 @@ export default function HomeFeed({
                   <Countdown expiresAt={t.expires_at} />
                 </div>
               </Link>
-              {i === 2 && brands && brands.length > 0 && (
+              {i === 2 && brands && brands.length > 0 && !cleanQuery && (
                 <Link
                   href="/brands"
                   className="glass-card brand-teaser"
@@ -180,8 +251,22 @@ export default function HomeFeed({
             <div className="glass-card empty-state">
               {loadingEnded ? 'Loading ended battles…' : 'No ended battles yet.'}
             </div>
+          ) : endedTopics.length > 0 && filteredEnded.length === 0 ? (
+            <div className="glass-card empty-state" style={{ padding: '30px 20px' }}>
+              <p style={{ margin: '0 0 12px', fontSize: '15px' }}>
+                No ended battles matching &ldquo;<strong>{query}</strong>&rdquo;
+              </p>
+              <button
+                type="button"
+                className="glass-button"
+                style={{ padding: '8px 18px', fontSize: '13px' }}
+                onClick={() => setQuery('')}
+              >
+                Clear search
+              </button>
+            </div>
           ) : (
-            endedTopics.map((t) => (
+            filteredEnded.map((t) => (
               <Link className="glass-card ended-topic" href={`/results/${t.id}`} key={t.id}>
                 <div className="ended-content">
                   <h2 className="ended-title">{t.title}</h2>
