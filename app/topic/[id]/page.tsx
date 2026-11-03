@@ -18,7 +18,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
 
   const { data: options } = await adminDb
     .from('options')
-    .select('id,text,vote_count,delete_votes,created_at')
+    .select('id,text,image_url,vote_count,delete_votes,created_at')
     .eq('topic_id', topic.id)
     .order('vote_count', { ascending: false });
 

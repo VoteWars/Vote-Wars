@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { adminDb } from '@/lib/server';
 
 export const dynamic = 'force-dynamic';
@@ -15,7 +16,7 @@ export default async function Results({ params }: { params: Promise<{ id: string
 
   const { data: options } = await adminDb
     .from('options')
-    .select('id,text,vote_count')
+    .select('id,text,image_url,vote_count')
     .eq('topic_id', topic.id)
     .order('vote_count', { ascending: false });
   const winner = options?.[0];
@@ -32,14 +33,17 @@ export default async function Results({ params }: { params: Promise<{ id: string
       <div className="option-list">
         {(options || []).map((option) => (
           <article
-            className={`glass-card option-card ${winner?.id === option.id ? 'winner' : ''}`}
+            className={`glass-card option-card ${option.image_url ? 'image-option-card' : 'text-option-card'} ${winner?.id === option.id ? 'winner' : ''}`}
             key={option.id}
           >
-            <div className="option-line">
-              <span className="option-text">
-                {option.text}{winner?.id === option.id ? ' · Winner' : ''}
-              </span>
+            {option.image_url ? (
+              <Image className="option-vote-image" src={option.image_url} alt="Image option" width={800} height={800} unoptimized />
+            ) : (
+              <span className="option-text">{option.text}</span>
+            )}
+            <div className="option-line option-vote-summary">
               <span className="option-count">{option.vote_count} votes</span>
+              {winner?.id === option.id && <strong className="brand-yellow">Winner</strong>}
             </div>
           </article>
         ))}
