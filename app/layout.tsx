@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import 'react-easy-crop/react-easy-crop.css';
 import { AuthProvider } from '@/components/AuthProvider';
 import Frame from '@/components/Frame';
 
