@@ -61,7 +61,7 @@ export default function ProfileView() {
             textAlign: 'left',
           }}
         >
-          📧 <strong>Notice for new users:</strong> When you sign up, you will receive a confirmation email from <strong>Supabase Auth</strong> to verify your account. Please check your inbox and spam folder.
+          ⚔️ <strong>How it works:</strong> Anyone can vote. Sign in when you want to create a battle or add an option.
         </div>
       </div>
     );
@@ -91,7 +91,7 @@ export default function ProfileView() {
             lineHeight: 1.5,
           }}
         >
-          📧 <strong>Notice:</strong> When you create an account, you will receive an email from <strong>Supabase Auth</strong> to confirm and protect your account.
+          ⚔️ <strong>You&apos;re in the arena:</strong> Vote freely, and add your own options or battles whenever inspiration hits.
         </div>
       )}
 
